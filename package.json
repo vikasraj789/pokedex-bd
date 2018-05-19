@@ -13,7 +13,8 @@
         "preinstall": "node useYarn.js",
         "start": "node server.js"
     },
-    "devDependencies": {
+    "devDependencies": {},
+    "dependencies": {
         "express": "^4.16.3"
     }
 }
