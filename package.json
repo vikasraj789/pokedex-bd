@@ -1,0 +1,19 @@
+{
+    "name": "pokedex-bd",
+    "version": "1.0.0",
+    "description": "Pokedex back end",
+    "main": "index.js",
+    "author": "Vikas Reddy",
+    "license": "MIT",
+    "engines": {
+        "node": ">=8.9.4",
+        "npm": ">=5.6.0"
+    },
+    "scripts": {
+        "preinstall": "node useYarn.js",
+        "start": "node server.js"
+    },
+    "devDependencies": {
+        "express": "^4.16.3"
+    }
+}
