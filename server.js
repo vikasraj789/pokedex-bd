@@ -19,8 +19,8 @@ app.use((req, res, next) => {
 
 // Rest api's
 app.get("/", async (req, res) => {
-    const res = await P.getPokedexsList();
-    const data = await res.json();
+    const resp = await P.getPokedexsList();
+    const data = await resp.json();
     res.send(data);
 });
 
