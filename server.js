@@ -40,7 +40,8 @@ app.use((req, res, next) => {
 });
 
 // Rest api's
-app.get("/", async (req, res) => {
+app.post("/", async (req, res) => {
+    console.log("res", res);
     try {
         const resp = await P.getPokemonsList({
             limit: 10,
