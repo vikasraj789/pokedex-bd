@@ -42,7 +42,10 @@ app.use((req, res, next) => {
 // Rest api's
 app.post("/", async (req, res) => {
     try {
-        const resp = await P.getPokemonsList(res.body);
+        const resp = await P.getPokemonsList({
+            limit: 10,
+            offset: 0
+        });
         if (resp && resp.results) {
             const data = [];
             // let client = await MongoClient.connect(mongoUrl);
