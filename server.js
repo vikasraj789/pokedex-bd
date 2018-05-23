@@ -45,6 +45,7 @@ app.post("/", async (req, res) => {
         console.log(req.body);
         const resp = await P.getPokemonsList(req.body);
         if (resp && resp.results) {
+            console.log(resp.results);
             const data = [];
             // let client = await MongoClient.connect(mongoUrl);
             // console.log("Connected correctly to server");
