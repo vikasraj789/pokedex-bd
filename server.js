@@ -42,6 +42,7 @@ app.use((req, res, next) => {
 // Rest api's
 app.post("/", async (req, res) => {
     try {
+        console.log(req.body);
         const resp = await P.getPokemonsList(req.body);
         if (resp && resp.results) {
             const data = [];
