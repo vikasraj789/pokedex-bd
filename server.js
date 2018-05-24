@@ -17,20 +17,6 @@ const dbName = "pokedex";
 let db;
 let mongo;
 
-// Use connect method to connect to the server
-// MongoClient.connect(mongoUrl, function(err, client) {
-//     console.log("Connected successfully to mongo");
-
-//     db = client.db(dbName);
-//     mongo = client;
-//     const collection = db.collection("test");
-//     // Find some documents
-//     collection.find({}).toArray(function(err, docs) {
-//         console.log("Found the following records");
-//         console.log(docs);
-//     });
-// });
-
 // middlewares
 app.use(bodyParser.json());
 app.use((req, res, next) => {
@@ -45,20 +31,6 @@ app.post("/", async (req, res) => {
         const resp = await P.getPokemonsList(req.body);
         if (resp && resp.results) {
             const data = [];
-            // let client = await MongoClient.connect(mongoUrl);
-            // console.log("Connected correctly to server");
-
-            // const db = client.db(dbName);
-
-            // let r = await db
-            //     .collection("test")
-            //     .find({})
-            //     .toArray(function(err, docs) {
-            //         console.log("Found the following records");
-            //         console.log(docs);
-            //         data.push(docs);
-            //     });
-            // client.close();
             for (let poke of resp.results) {
                 const rawData = await P.getPokemonByName(poke.name);
                 const types = [];
@@ -78,6 +50,25 @@ app.post("/", async (req, res) => {
     } catch (exc) {
         console.log(exc);
     }
+});
+
+app.put("/favourite", async (req, res) => {
+    const { userId, name } = req.body;
+    let client = await MongoClient.connect(mongoUrl);
+    const db = client.db(dbName);
+    const user = await db.collection("favourites").findOne({ userId: userId });
+    if (user) {
+        const update = await db.collection("favourites").update({ userId: userId }, { $addToSet: { names: [name] } });
+    } else {
+        const insert = await db.collection("favourites").insert({ userId: userId, names: [name] });
+    }
+    client.close();
+    if (update || insert) {
+        res.status(200);
+        res.send("Created");
+    }
+    res.status(400);
+    res.send("Bad Request");
 });
 
 console.log(`Your server is running on port -- ${PORT}`);
