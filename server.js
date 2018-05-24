@@ -50,6 +50,23 @@ app.put("/favourite", async (req, res) => {
     }
 });
 
+app.put("/unFavourite", async (req, res) => {
+    try {
+        const { userId, name } = req.body;
+        let client = await MongoClient.connect(mongoUrl);
+        const db = client.db(dbName);
+        const update = await db.collection("favourites").update({ userId: userId }, { $pull: { names: name } });
+        client.close();
+        if (update) {
+            res.status(200).send({ status: 200, message: "Updated" });
+        }
+        res.status(400).send({ status: 400, message: "Bad Request" });
+    } catch (exc) {
+        console.log(exc);
+        res.status(500).send({ status: 500, message: "Internal server error" });
+    }
+});
+
 app.post("/", async (req, res) => {
     try {
         const { userId } = req.body;
