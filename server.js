@@ -27,7 +27,8 @@ app.use((req, res, next) => {
 });
 
 // Rest api's
-app.post("/favourite", async (req, res) => {
+app.put("/favourite", async (req, res) => {
+    console.log("in put");
     try {
         const { userId, name } = req.body;
         let client = await MongoClient.connect(mongoUrl);
