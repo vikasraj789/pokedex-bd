@@ -34,10 +34,11 @@ app.put("/favourite", async (req, res) => {
         let client = await MongoClient.connect(mongoUrl);
         const db = client.db(dbName);
         const user = await db.collection("favourites").findOne({ userId: userId });
+        let update, insert;
         if (user) {
-            const update = await db.collection("favourites").update({ userId: userId }, { $addToSet: { names: [name] } });
+            update = await db.collection("favourites").update({ userId: userId }, { $addToSet: { names: [name] } });
         } else {
-            const insert = await db.collection("favourites").insert({ userId: userId, names: [name] });
+            insert = await db.collection("favourites").insert({ userId: userId, names: [name] });
             if (insert) console.log("inserted", insert);
         }
         client.close();
