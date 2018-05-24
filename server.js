@@ -27,9 +27,10 @@ app.use((req, res, next) => {
 });
 
 // Rest api's
-app.put("/favourite", async (req, res) => {
+app.put("/favourite/:userId", async (req, res) => {
     try {
-        const { userId, name } = req.body;
+        const { name } = req.body;
+        const userId = req.param("userId");
         let client = await MongoClient.connect(mongoUrl);
         const db = client.db(dbName);
         const user = await db.collection("favourites").findOne({ userId: userId });
@@ -51,9 +52,10 @@ app.put("/favourite", async (req, res) => {
     }
 });
 
-app.put("/unFavourite", async (req, res) => {
+app.put("/unFavourite/:userId", async (req, res) => {
     try {
-        const { userId, name } = req.body;
+        const { name } = req.body;
+        const userId = req.param("userId");
         let client = await MongoClient.connect(mongoUrl);
         const db = client.db(dbName);
         const update = await db.collection("favourites").update({ userId: userId }, { $pull: { names: name } });
