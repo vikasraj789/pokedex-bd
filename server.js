@@ -27,6 +27,30 @@ app.use((req, res, next) => {
 });
 
 // Rest api's
+app.post("/favourite", async (req, res) => {
+    try {
+        const { userId, name } = req.body;
+        let client = await MongoClient.connect(mongoUrl);
+        const db = client.db(dbName);
+        const user = await db.collection("favourites").findOne({ userId: userId });
+        if (user) {
+            const update = await db.collection("favourites").update({ userId: userId }, { $addToSet: { names: [name] } });
+        } else {
+            const insert = await db.collection("favourites").insert({ userId: userId, names: [name] });
+            if (insert) console.log("inserted", insert);
+        }
+        client.close();
+        if (update || insert) {
+            res.status(200);
+            res.send("Created");
+        }
+        res.status(400);
+        res.send("Bad Request");
+    } catch (exc) {
+        console.log(exc);
+    }
+});
+
 app.post("/", async (req, res) => {
     try {
         const resp = await P.getPokemonsList(req.body);
@@ -48,30 +72,6 @@ app.post("/", async (req, res) => {
             }
             res.send(data);
         }
-    } catch (exc) {
-        console.log(exc);
-    }
-});
-
-app.post("/favourite", async (req, res) => {
-    try {
-        const { userId, name } = req.body;
-        let client = await MongoClient.connect(mongoUrl);
-        const db = client.db(dbName);
-        const user = await db.collection("favourites").findOne({ userId: userId });
-        if (user) {
-            const update = await db.collection("favourites").update({ userId: userId }, { $addToSet: { names: [name] } });
-        } else {
-            const insert = await db.collection("favourites").insert({ userId: userId, names: [name] });
-            if (insert) console.log("inserted", insert);
-        }
-        client.close();
-        if (update || insert) {
-            res.status(200);
-            res.send("Created");
-        }
-        res.status(400);
-        res.send("Bad Request");
     } catch (exc) {
         console.log(exc);
     }
