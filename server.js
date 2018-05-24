@@ -28,7 +28,6 @@ app.use((req, res, next) => {
 
 // Rest api's
 app.put("/favourite", async (req, res) => {
-    console.log("in put");
     try {
         const { userId, name } = req.body;
         let client = await MongoClient.connect(mongoUrl);
@@ -39,25 +38,29 @@ app.put("/favourite", async (req, res) => {
             update = await db.collection("favourites").update({ userId: userId }, { $addToSet: { names: name } });
         } else {
             insert = await db.collection("favourites").insert({ userId: userId, names: [name] });
-            if (insert) console.log("inserted", insert);
         }
         client.close();
         if (update || insert) {
-            res.status(200);
-            res.send("Created");
+            res.status(200).send({ status: 200, message: "Created" });
         }
-        res.status(400);
-        res.send("Bad Request");
+        res.status(400).send({ status: 400, message: "Bad Request" });
     } catch (exc) {
         console.log(exc);
+        res.status(500).send({ status: 500, message: "Internal server error" });
     }
 });
 
 app.post("/", async (req, res) => {
     try {
-        const resp = await P.getPokemonsList(req.body);
+        const { userId } = req.body;
+        const resp = await P.getPokemonsList(req.body.params);
         if (resp && resp.results) {
             const data = [];
+            let client = await MongoClient.connect(mongoUrl);
+            const db = client.db(dbName);
+            const doc = await db.collection("favourites").findOne({ userId: userId });
+            client.close();
+            const favs = doc && doc.names ? doc.names : [];
             for (let poke of resp.results) {
                 const rawData = await P.getPokemonByName(poke.name);
                 const types = [];
@@ -69,13 +72,15 @@ app.post("/", async (req, res) => {
                 data.push({
                     avatar: rawData.sprites.front_default,
                     types: types,
-                    name: poke.name
+                    name: poke.name,
+                    isFav: favs.indexOf(poke.name) > -1
                 });
             }
             res.send(data);
         }
     } catch (exc) {
         console.log(exc);
+        res.status(500).send({ status: 500, message: "Internal server error" });
     }
 });
 
