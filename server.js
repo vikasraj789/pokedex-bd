@@ -36,7 +36,7 @@ app.put("/favourite", async (req, res) => {
         const user = await db.collection("favourites").findOne({ userId: userId });
         let update, insert;
         if (user) {
-            update = await db.collection("favourites").update({ userId: userId }, { $addToSet: { names: [name] } });
+            update = await db.collection("favourites").update({ userId: userId }, { $addToSet: { names: name } });
         } else {
             insert = await db.collection("favourites").insert({ userId: userId, names: [name] });
             if (insert) console.log("inserted", insert);
