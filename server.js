@@ -53,23 +53,28 @@ app.post("/", async (req, res) => {
     }
 });
 
-app.put("/favourite", async (req, res) => {
-    const { userId, name } = req.body;
-    let client = await MongoClient.connect(mongoUrl);
-    const db = client.db(dbName);
-    const user = await db.collection("favourites").findOne({ userId: userId });
-    if (user) {
-        const update = await db.collection("favourites").update({ userId: userId }, { $addToSet: { names: [name] } });
-    } else {
-        const insert = await db.collection("favourites").insert({ userId: userId, names: [name] });
+app.post("/favourite", async (req, res) => {
+    try {
+        const { userId, name } = req.body;
+        let client = await MongoClient.connect(mongoUrl);
+        const db = client.db(dbName);
+        const user = await db.collection("favourites").findOne({ userId: userId });
+        if (user) {
+            const update = await db.collection("favourites").update({ userId: userId }, { $addToSet: { names: [name] } });
+        } else {
+            const insert = await db.collection("favourites").insert({ userId: userId, names: [name] });
+            if (insert) console.log("inserted", insert);
+        }
+        client.close();
+        if (update || insert) {
+            res.status(200);
+            res.send("Created");
+        }
+        res.status(400);
+        res.send("Bad Request");
+    } catch (exc) {
+        console.log(exc);
     }
-    client.close();
-    if (update || insert) {
-        res.status(200);
-        res.send("Created");
-    }
-    res.status(400);
-    res.send("Bad Request");
 });
 
 console.log(`Your server is running on port -- ${PORT}`);
