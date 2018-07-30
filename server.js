@@ -8,7 +8,7 @@ const dummyData = [];
 
 for (let i = 0; i < 100; i++) {
     const temp = {
-        avatar: "https://pokeapi.co/media/sprites/pokemon/back/female/12.png",
+        avatar: "http://pokeapi.co/media/sprites/pokemon/back/female/12.png",
         types: ["grass", "football", "sport"],
         name: `balbusaur${i}`,
         isFav: false
